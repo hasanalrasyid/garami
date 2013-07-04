@@ -1,0 +1,464 @@
+#!/bin/bash
+clear
+initnya() {
+echo init
+rm -rf ${HOME}/.ssh/*
+ssh-keygen -N "" -f ${HOME}/.ssh/id_rsa
+cp ${HOME}/.ssh/id_rsa.pub ${HOME}/.ssh/authorized_keys
+chmod -R og-rwx ${HOME}/.ssh
+for i in {0..8} ; do
+scp -r ${HOME}/.ssh compute-0-${i}:${HOME} 
+done
+rocks run host  "rm -f ~/kerja; ln -s /share/apps/kerja/$USER ~/kerja"
+}
+ceknya(){
+				if [ -z "$(qstat -f -u "*" -ne)" ] ; then echo Belum ada antrian pada sistem;else
+								qstat -f -u "*" -ne;
+				fi
+}
+evieCompile(){
+#/share/apps/gcc/4.7.0/bin/gfortran $1 -o $2 
+echo Perintahnya adalah:
+echo /share/apps/gcc/4.7.0/bin/gfortran $(echo $@|sed -e 's/evie//g' )
+/share/apps/gcc/4.7.0/bin/gfortran $(echo $@|sed -e 's/evie//g' )
+}
+c2v(){
+		echo Mengubah z-matrix dengan format Constants menjadi Variables
+		echo input file $2
+		echo hasilnya adalah:
+		echo $2.zmt
+		echo '#ZMATRIX' > ${2}.zmt
+		 awk '{ sub("\r$", ""); print }' $2| awk '{print $1" "$2" rad"NR" "$4" ang"NR" "$6" dih"NR" "}'| sed -e 's/\(rad1 \|ang1 \|ang2 \|dih2 \|dih1 \|dih3 \)//g' >> ${2}.zmt
+		echo "" >> ${2}.zmt
+		 awk '{ sub("\r$", ""); print }' $2| awk '{print "rad"NR" "$3"\nang"NR" "$5"\ndih"NR" "$7}'| sed -e 's/\(rad1 \|ang1 \|ang2 \|dih2 \|dih1 \|dih3 \)//g' -e '/^$/d' >> ${2}.zmt
+}
+og09_2_ig09_pdb(){
+echo Masukkan nama file input sebagai template
+read NAMAI
+echo Struktur pada file input $NAMAI bermula pada baris ke...
+read BARISI
+echo 'Masukkan nama file output gaussian09 yang memiliki struktur baru (dalam xyz)'
+read NAMAO
+echo Struktur pada file output $NAMAO bermula pada baris ke...
+read BARISO
+echo Jumlah atom
+read JATOM
+NAMANYA=$(echo ${NAMAI/.*/})
+more +$BARISI "$NAMAI" | head -$JATOM | awk '{print $1,$2,$6}' > og092ig09pdb1.tmp
+more +$BARISO "$NAMAO" | head -$JATOM | sed -e 's/,/ /g' > og092ig09pdb2.tmp
+head -$((BARISI-1)) "$NAMAI" >  ${NAMANYA}_baru.g09
+diff -y og092ig09pdb1.tmp og092ig09pdb2.tmp | awk '{print $1,$2,$7,$8,$9,$3}' >> ${NAMANYA}_baru.g09
+more +$((BARISI+JATOM)) "$NAMAI" >>  ${NAMANYA}_baru.g09
+rm -f og092ig09pdb1.tmp og092ig09pdb2.tmp 
+echo Telah dibuat file bernama ${NAMANYA}_baru.g09 yang seharusnya berisi 
+echo file $NAMAI dengan struktur yang sesuai dengan $NAMAO baris ke $BARISO
+
+exit
+}
+echo "Ganesha Advanced Resource Management Interface (GARAMI)"
+if [ -z $1 ] ; then
+  echo "Jalankan program ini dengan perintah:"
+  echo "garami [init|list|convert] inputfile"
+  echo "parameter init diperlukan hanya sekali, untuk menginisiasi lingkungan perhitungan anda"
+  exit 1
+fi
+if [ "$1" == "convert" ]; then
+if [ "$2" == "pdbg09" ]; then
+  echo 'Mengubah struktur pdb dalam file input g09 menjadi struktur baru (dalam xyz)'
+  og09_2_ig09_pdb
+  exit 1
+fi
+if [ "$(sed -n '1p' $2 | awk '{print NF}')" == "1" ];then 
+	if [ "$(sed -n '2p' $2 | awk '{print NF}')" == "3" ];then 
+	if [ "$(sed -n '3p' $2 | awk '{print NF}')" == "5" ];then 
+		c2v $@
+		exit 1 
+	fi
+	fi
+fi
+	echo Gagal konversi z-matrix, Yakinkah bahwa anda telah memasukkan file yang isinya
+	echo hanya z-matrix saja? ;
+	echo "beberapa baris awal dari input file anda  $2 adalah "
+	head -3 $2
+	echo ........
+exit 100 
+fi
+
+if [ "$1" == "list" ]; then
+ceknya
+exit 101
+fi
+#echo "Maaf saat ini HPC sedang dalam maintenance hingga 28 Juni 2013. Terima kasih atas kesabaran anda. Admin"
+#exit;
+if [ "$1" == "init" ]; then
+initnya
+exit 100 
+fi
+if [ ! -s "$1" ]; then
+				echo file input tidak ada dalam folder ini atau filenya kosong.
+				echo saat ini anda berada dalam folder:
+				pwd
+				echo file input yang ingin anda jalankan adalah:
+				echo $1
+				echo sebagian file dalam folder ini adalah:
+				ls | head 
+				echo .....
+				exit 102
+fi
+if [ "$(pwd)" == "$HOME" ] ;then 
+				echo anda run garami di direktori home $HOME ini sangat tidak dianjurkan. 
+				echo jalankan kerja anda dalam folder khusus dalam $HOME
+				echo jalankan:
+				echo mkdir folderbaru
+				echo cd folderbaru
+				exit 1111
+fi	
+
+if [ "$1" == "evie" ]; then
+echo Mengcompile file $2 menjadi file executable $3
+evieCompile $@
+exit 201
+fi
+if [ "$1" == "kb" ]; then
+SMNT=`mkpasswd -s 0 -d 0`
+NAMAKERJA=$SMNT
+echo "Mengolah Software Kebumian" 
+echo "Cek ketersediaan nodes"
+echo "Penyusunan runner script"
+rm -f *.sge
+rm -f *.rhpc
+rm -rf hasil
+if [ -n "$2" ]; then
+			cp -f $2 $SMNT.rhpc
+			chmod +x $SMNT.rhpc
+else
+			echo "cantumkan nama file biner dalam folder ini yang akan dijalankan"
+			echo "contoh:"
+			echo "garami kb as_malaka"
+			exit 201
+fi
+
+echo $(pwd)
+for i in {0..8}; do ssh compute-0-$i "rm -rf $(pwd);mkdir -p $(pwd)";done
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N $SMNT
+#$ -pe mpich 24
+mkdir -p \$SGE_CWD_PATH
+export LD_LIBRARY_PATH=/share/apps/gcc/4.7.0/lib:/share/apps/gcc/4.7.0/lib64:$LD_LIBRARY_PATH 
+export OMP_NUM_THREADS=24
+mkdir -p $(pwd)
+cd $(pwd)
+scp -r hpc:$(pwd)/* $(pwd)
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+chmod +x ${SMNT}.rhpc
+
+ulimit -s unlimited
+
+ssh hpc "rm -rf $(pwd)/hasil"
+ssh hpc "mkdir -p $(pwd)/hasil"
+./${SMNT}.rhpc > output_hpc.log
+scp -r * hpc:$(pwd)/hasil
+for i in {1..10}; do 
+./${SMNT}.rhpc >> output_hpc.log
+scp -r * hpc:$(pwd)/hasil
+done
+
+rm -rf *
+EOF
+
+echo "Masuk ke dalam antrian"
+qsub $SMNT.sge
+echo "Kerja anda telah masuk ke dalam antrian,"
+echo "untuk cek status kerja, gunakan perintah: garami list "
+exit 
+fi
+
+
+mkdir -p /share/apps/kerja/${USER}
+
+SMNT=`mkpasswd -s 0`
+KERJANYA=${1/*./}
+# supaya diperoleh nama file setelah dibuang ekstensinya
+NAMAKERJA=$(echo $1 | sed s/.${KERJANYA}//)
+echo "Pembersihan file temporary dan output dari perhitungan sebelumnya"
+rm -f *.sge
+rm -f `pwd`/${NAMAKERJA}.out
+rocks run host "rm -rf $(pwd);mkdir -p $(pwd)"
+
+case ${KERJANYA} in
+g09) 
+echo "Mengolah input Gaussian 09" $1
+echo "Cek ketersediaan nodes"
+SCRATCHDIR=/state/partition1/tmp/$USER/g09/$SMNT
+mkdir -p $SCRATCHDIR
+input=$NAMAKERJA
+ADACHKNYA=$(grep "%Chk=" $1|sed -e 's/.Chk=//g');
+ln -s ${HOME}/kerja/$SMNT.log `pwd`/${NAMAKERJA}.out
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+export g09root=/share/apps
+source \$g09root/g09/bsd/g09.profile
+export GAUSS_SCRDIR=$SCRATCHDIR
+mkdir -p \$GAUSS_SCRDIR
+mkdir -p $(pwd)
+mkdir -p $SCRATCHDIR $(pwd);scp hpc:$(pwd)/$1 $(pwd)
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+mkdir -p \$SGE_CWD_PATH
+DAFTAR=\`sort -u \$TMPDIR/machines | sed "s/$/:4/g" | paste -s -d "," \`
+echo "Menjalankan gaussian di \$MY_HOST pada \$MY_DATE"
+tmpinp=${input}.tmp$$
+###########echo "%LindaWorkers=\$DAFTAR" > \$tmpinp
+echo "%NoSave" >> \$tmpinp
+if [ -z "$ADACHKNYA" ]; then
+	echo "%Chk=${SCRATCHDIR}/${NAMAKERJA}.chk" >> \$tmpinp
+fi
+echo "%NProcShared=24" >> \$tmpinp
+echo "%Mem=14GB" >> \$tmpinp
+cat $1 >> \$tmpinp
+g09 \$tmpinp /share/apps/kerja/${USER}/$SMNT.log
+if [ -z "$ADACHKNYA" ]; then
+formchk -3 ${SCRATCHDIR}/${NAMAKERJA}.chk ${SCRATCHDIR}/${NAMAKERJA}.fchk
+else
+				formchk -3 $ADACHKNYA $ADACHKNYA.fchk
+fi
+
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out; cp \${HOME}/kerja/$SMNT.log  \`pwd\`/${NAMAKERJA}.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+
+EOF
+;;
+g03) 
+echo "Mengolah input Gaussian 03" $1
+echo "Cek ketersediaan nodes"
+ln -s ${HOME}/kerja/$SMNT.log `pwd`/${NAMAKERJA}.out
+SCRATCHDIR=/state/partition1/tmp/$USER/g03/$SMNT
+mkdir -p $SCRATCHDIR
+input=$NAMAKERJA
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+export g03root=/share/apps
+source \$g03root/g03/bsd/g03.profile
+export GAUSS_SCRDIR=$SCRATCHDIR
+mkdir -p \$GAUSS_SCRDIR
+mkdir -p $SCRATCHDIR $(pwd);scp hpc:$(pwd)/$1 $(pwd)
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+mkdir -p \$SGE_CWD_PATH
+DAFTAR=\`sort -u \$TMPDIR/machines | sed "s/$/:4/g" | paste -s -d "," \`
+echo "Menjalankan gaussian di \$MY_HOST pada \$MY_DATE"
+tmpinp=${input}.tmp$$
+echo "%LindaWorkers=\$DAFTAR" > \$tmpinp
+echo "%NProcShared=8" >> \$tmpinp
+echo "%Mem=2GB" >> \$tmpinp
+cat $1 >> \$tmpinp
+
+g03l \$tmpinp /share/apps/kerja/${USER}/$SMNT.log
+
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out; cp \${HOME}/kerja/$SMNT.log  \`pwd\`/${NAMAKERJA}.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+
+EOF
+;;
+lvi) 
+echo "Mengolah input LevoCrys" $1 $2
+echo "Cek ketersediaan nodes"
+ln -s ${HOME}/kerja/$SMNT.log `pwd`/${NAMAKERJA}.out
+SCRATCHDIR=/state/partition1/tmp/$USER/QE
+PSEUDODIR=/share/apps/espresso-4.3.2/pseudo
+# baris-baris ini untuk menyusun kembali input file supaya sesuai keadaan program levocrys
+input1=${NAMAKERJA}_tmp.lvi
+input2=${NAMAKERJA}_tmp.qe
+head -n $(expr $(awk '/crystal/ {print NR}' $1) - 1) $1 > $input1
+echo -e "temporarypath\n./\n\nresultpath\n./\n\ncrystal" >> $input1
+tail -n $(expr $(awk "END {print NR}" $1) - $(awk '/crystal/ {print NR}' $1)) $1 >> $input1
+# 1 baris dibawah ini masih ragu, mohon dicek kembali
+sed "s:LEVO_QE_RUN_PREFIX=.*:LEVO_QE_RUN_PREFIX=\"/share/apps/mpich2-intel/bin/mpiexec -np 24 \":" $2 | \
+sed "s:LEVO_QE_COMMAND=.*:LEVO_QE_COMMAND=\"/share/apps/espresso-4.3.2/bin/pw.x \":" > $input2
+mkdir -p $SCRATCHDIR
+
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+export QE_PSEUDO_DIR=$PSEUDODIR
+export QE_SCR_DIR=$SCRATCHDIR
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+mkdir -p \$SGE_CWD_PATH
+DAFTAR=\`sort -u \$TMPDIR/machines | paste -s -d "," \`
+mkdir -p $SCRATCHDIR $(pwd);scp hpc:$(pwd)/$input1 $(pwd); scp hpc:$(pwd)/$input2 $(pwd)
+
+/share/apps/LEVO/levocrys $input1 $input2 > /share/apps/kerja/$USER/$SMNT.log 2>&1 
+
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out \`pwd\`/hasil.tbz; cp /share/apps/kerja/$USER/$SMNT.log  $(pwd)/${NAMAKERJA}.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+tar -cjf hasil.tbz *.result *.runtmp
+scp -r hasil.tbz hpc:\$SGE_CWD_PATH
+EOF
+;;
+
+pwi) 
+echo "Mengolah input Quantum-Espresso" $1
+echo "Cek ketersediaan nodes"
+ln -s ${HOME}/kerja/$SMNT.log `pwd`/${NAMAKERJA}.out
+SCRATCHDIR=/state/partition1/tmp/$USER/QE/$SMNT
+PSEUDODIR=/share/apps/espresso-4.3.2/pseudo
+sed -s 's|\(pseudo_dir\).*|\1 = '\'$PSEUDODIR'\/'\'', \n outdir = '\'$SCRATCHDIR'\/'\'',|g' $1 > tmp.in
+
+#/share/apps/mpich2-intel/bin/mpiexec -np 16 -host hpc.local,compute-0-0 /share/apps/espresso-4.3.2/bin/pw.x -in tmp.in
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+DAFTAR=\`sort -u \$TMPDIR/machines | paste -s -d "," \`
+export LD_LIBRARY_PATH=/share/apps/fftw-3.3/lib:/share/apps/mpich2-gfortran/lib:/opt/gridengine/lib/lx26-amd64:/opt/openmpi/lib:/share/apps/intel/composerxe-2011.2.137/compiler/lib/intel64:/share/apps/intel/composerxe-2011.2.137/mpirt/lib/intel64:/share/apps/intel/composerxe-2011.2.137/ipp/../compiler/lib/intel64:/share/apps/intel/composerxe-2011.2.137/ipp/lib/intel64:/share/apps/intel/composerxe-2011.2.137/compiler/lib/intel64:/share/apps/intel/composerxe-2011.2.137/mkl/lib/intel64:/share/apps/intel/composerxe-2011.2.137/tbb/lib/intel64//cc4.1.0_libc2.4_kernel2.6.16.21:/state/partition1/home/ki/s2/08/hasan/library/gmp:LD_LIBRARY_PATH
+mkdir -p $SCRATCHDIR $(pwd)
+scp hpc:$(pwd)/tmp.in $(pwd)
+
+/share/apps/mpich2-intel/bin/mpiexec -np 24 -host \$DAFTAR /share/apps/espresso-4.3.2/bin/pw.x -in tmp.in &> /share/apps/kerja/$USER/$SMNT.log
+
+scp $(pwd)/* hpc:$(pwd)
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out; cp /share/apps/kerja/$USER/$SMNT.log  \`pwd\`/${NAMAKERJA}.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+
+#/share/apps/mpich2-intel/bin/mpiexec -np 24 -host compute-0-0 /share/apps/espresso-4.3.2/bin/pw.x -in tmp.in
+EOF
+;;
+
+nw) 
+echo "Mengolah input NwChem" $1
+echo "Cek ketersediaan nodes"
+rm -f *.out *.sge tmp.in
+ln -s /share/apps/kerja/$USER/$SMNT.log `pwd`/${NAMAKERJA}.out
+ln -s /share/apps/kerja/$USER/${SMNT}_vis.log `pwd`/${NAMAKERJA}_vis.out
+#SCRATCHDIR=/state/partition1/tmp/$USER/QE
+#PSEUDODIR=/share/apps/espresso-4.3.2/pseudo
+sed  "s/\(ecce_print\).*/\1 \/share\/apps\/kerja\/$USER\/${SMNT}_vis.log/" $1 > tmp.in
+#sed  "s/\(pseudo_dir\).*/\1 = '$(echo $PSEUDODIR | sed 's/\//\\\//g')\/'/" 
+#mkdir -p $SCRATCHDIR
+
+
+
+#/share/apps/mpich2-intel/bin/mpiexec -np 16 -host hpc.local,compute-0-0 /share/apps/espresso-4.3.2/bin/pw.x -in tmp.in
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+mkdir -p \$SGE_CWD_PATH
+DAFTAR=\$(sort -u \$TMPDIR/machines | paste -s -d "," )
+DAFTAR=\$(hostname)
+export NWCHEM_TOP=/share/apps/nwchem-6.0
+export NWCHEM_BASIS_LIBRARY=/share/apps/nwchem-6.0/src/basis/libraries/
+
+mkdir -p $(pwd)
+scp hpc:$(pwd)/* $(pwd)
+cd $(pwd)
+/share/apps/mpich2/gcc_4.7.0/bin/mpirun -np 24 -host \$DAFTAR /share/apps/nwchem-6.0/bin/LINUX64/nwchem tmp.in &> /share/apps/kerja/$USER/$SMNT.log
+
+scp $(pwd)/* hpc:$(pwd)
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out; cp /share/apps/kerja/$USER/$SMNT.log  \`pwd\`/${NAMAKERJA}.out; cp /share/apps/kerja/$USER/${SMNT}_vis.log $(pwd)/${NAMAKERJA}_vis.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+
+EOF
+;;
+
+
+nw1) 
+echo "Mengolah input NwChem 6.1" $1
+echo "Cek ketersediaan nodes"
+rm -f *.out *.sge tmp.in
+ln -s /share/apps/kerja/$USER/$SMNT.log `pwd`/${NAMAKERJA}.out
+ln -s /share/apps/kerja/$USER/${SMNT}_vis.log `pwd`/${NAMAKERJA}_vis.out
+#SCRATCHDIR=/state/partition1/tmp/$USER/QE
+#PSEUDODIR=/share/apps/espresso-4.3.2/pseudo
+sed  "s/\(ecce_print\).*/\1 \/share\/apps\/kerja\/$USER\/${SMNT}_vis.log/" $1 > tmp.in
+#sed  "s/\(pseudo_dir\).*/\1 = '$(echo $PSEUDODIR | sed 's/\//\\\//g')\/'/" 
+#mkdir -p $SCRATCHDIR
+
+
+
+#/share/apps/mpich2-intel/bin/mpiexec -np 16 -host hpc.local,compute-0-0 /share/apps/espresso-4.3.2/bin/pw.x -in tmp.in
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24 
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+mkdir -p \$SGE_CWD_PATH
+DAFTAR=\$(sort -u \$TMPDIR/machines | paste -s -d "," )
+DAFTAR=\$(hostname)
+export LD_LIBRARY_PATH=/share/apps/gcc/4.7.0/lib64:/share/apps/mpich2/gcc_4.7.0/lib:/opt/gridengine/lib/lx26-amd64
+export NWCHEM_TOP=/share/apps/nwchem-6.1
+export NWCHEM_BASIS_LIBRARY=/share/apps/nwchem-6.1/src/basis/libraries/
+mkdir -p $(pwd)
+scp hpc:$(pwd)/* $(pwd)
+cd $(pwd)
+/share/apps/mpich2/gcc_4.7.0/bin/mpirun -np 24 -host \$DAFTAR /share/apps/nwchem-6.1/bin/LINUX64/nwchem tmp.in &> /share/apps/kerja/$USER/$SMNT.log
+
+scp $(pwd)/* hpc:$(pwd)
+ssh hpc "rm -f \`pwd\`/${NAMAKERJA}.out; cp /share/apps/kerja/$USER/$SMNT.log  \`pwd\`/${NAMAKERJA}.out; cp /share/apps/kerja/$USER/${SMNT}_vis.log $(pwd)/${NAMAKERJA}_vis.out"
+rm -f /share/apps/kerja/$USER/$SMNT.log
+
+EOF
+;;
+*) echo "Input tak dikenal, sistem berhenti"
+exit 1
+;;
+esac
+
+if [ "$2" != "hapus" ] ; then
+echo "Mengatur proses penyimpanan file temporary (hanya berlaku untuk QE dan G03)"
+cat >> $SMNT.sge << EOF
+# Penyimpanan file temporary
+tar -cjf \`pwd\`/${NAMAKERJA}_scratch.tbz ${SCRATCHDIR} *
+scp \`pwd\`/${NAMAKERJA}_scratch.tbz hpc:\`pwd\`/
+rm -rf $SCRATCHDIR 
+EOF
+else
+cat >> $SMNT.sge << EOF
+rm -rf $SCRATCHDIR 
+EOF
+fi
+
+echo "Masuk ke dalam antrian"
+qsub $SMNT.sge
+echo "Kerja anda telah masuk ke dalam antrian,"
+echo "untuk cek status kerja, gunakan perintah: garami list "
