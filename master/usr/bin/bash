@@ -1,0 +1,11 @@
+#!/bin/sh
+
+SHELL=/bin/bash
+
+if [ $# -eq 0 ]; then
+  $SHELL
+else
+  shift
+  $SHELL -c "$@"
+fi
+

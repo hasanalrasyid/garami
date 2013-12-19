@@ -1,0 +1,13 @@
+#!/bin/sh
+SHELL=/bin/bash
+usernya=$(whoami)
+#   shell/command     
+if ([ $# -eq 0 ] && [ "$usernya" != "root" ]) ; then
+  echo "This node is available for you."
+elif [[ $# -eq 0 ]]; then
+    $SHELL
+else
+#    shift
+    $SHELL -c "$@"
+fi
+

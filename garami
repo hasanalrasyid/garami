@@ -1,16 +1,24 @@
 #!/bin/bash
 clear
-initnya() {
-echo init
-rm -rf ${HOME}/.ssh/*
-ssh-keygen -N "" -f ${HOME}/.ssh/id_rsa
-cp ${HOME}/.ssh/id_rsa.pub ${HOME}/.ssh/authorized_keys
-chmod -R og-rwx ${HOME}/.ssh
-for i in {0..8} ; do
-scp -r ${HOME}/.ssh compute-0-${i}:${HOME} 
-done
-rocks run host  "rm -f ~/kerja; ln -s /share/apps/kerja/$USER ~/kerja"
+prolog(){
+echo $JOB_ID > /share/apps/kerja/stats/${JOB_ID}.stat
+echo $(hostname) >> /share/apps/kerja/stats/${JOB_ID}.stat
+echo $SGE_CWD_PATH >> /share/apps/kerja/stats/${JOB_ID}.stat
+mkdir -p $SGE_CWD_PATH
+env >> /share/apps/kerja/stats/${JOB_ID}.stat
 }
+epilog(){
+  if [ -s "/share/apps/kerja/stats/${2}.stat" ]; then
+  jobidnya=$(sed '1q;d' /share/apps/kerja/stats/${2}.stat)
+  nodenya=$(sed '2q;d' /share/apps/kerja/stats/${2}.stat)
+  pathnya=$(sed '3q;d' /share/apps/kerja/stats/${2}.stat)
+  scp -r $nodenya:$pathnya/* $pathnya
+  ssh $nodenya "rm -rf $pathnya"
+  else
+  echo File ${2}.stat tak ditemukan
+  fi
+}
+
 ceknya(){
 				if [ -z "$(qstat -f -u "*" -ne)" ] ; then echo Belum ada antrian pada sistem;else
 								qstat -f -u "*" -ne;
@@ -83,7 +91,6 @@ fi
 	echo ........
 exit 100 
 fi
-
 if [ "$1" == "list" ]; then
 ceknya
 exit 101
@@ -91,8 +98,24 @@ fi
 #echo "Maaf saat ini HPC sedang dalam maintenance hingga 28 Juni 2013. Terima kasih atas kesabaran anda. Admin"
 #exit;
 if [ "$1" == "init" ]; then
-initnya
+#initnya
+echo perintah init telah dihilangkan. Laporkan kondisi anda pada hpc-admin@compscience.itb.ac.id
 exit 100 
+fi
+if [ "$1" == "prolog" ]; then
+prolog $@
+exit 
+fi
+if [ "$1" == "epilog" ]; then
+epilog $@
+exit
+fi
+cekDahulu(){
+if [ -a "hasil" ] ; then
+echo Anda bekerja dalam sebuah folder hasil perhitungan sebelumnya.
+echo Silakan bersihkan terlebih dahulu folder hasil , sebelum memulai perhitungan yang baru.
+echo rm -rf hasil
+exit 1011
 fi
 if [ ! -s "$1" ]; then
 				echo file input tidak ada dalam folder ini atau filenya kosong.
@@ -106,19 +129,23 @@ if [ ! -s "$1" ]; then
 				exit 102
 fi
 if [ "$(pwd)" == "$HOME" ] ;then 
-				echo anda run garami di direktori home $HOME ini sangat tidak dianjurkan. 
+				echo anda run garami di direktori home $HOME, hal ini sangat tidak dianjurkan. 
 				echo jalankan kerja anda dalam folder khusus dalam $HOME
 				echo jalankan:
 				echo mkdir folderbaru
 				echo cd folderbaru
 				exit 1111
 fi	
+}
 
+cekDahulu $@
+ 
 if [ "$1" == "evie" ]; then
 echo Mengcompile file $2 menjadi file executable $3
 evieCompile $@
 exit 201
 fi
+##################################kebumian
 if [ "$1" == "kb" ]; then
 SMNT=`mkpasswd -s 0 -d 0`
 NAMAKERJA=$SMNT
@@ -179,18 +206,46 @@ exit
 fi
 
 
-mkdir -p /share/apps/kerja/${USER}
 
 SMNT=`mkpasswd -s 0`
 KERJANYA=${1/*./}
+mkdir -p /share/apps/kerja/${USER}/${SMNT}
 # supaya diperoleh nama file setelah dibuang ekstensinya
 NAMAKERJA=$(echo $1 | sed s/.${KERJANYA}//)
 echo "Pembersihan file temporary dan output dari perhitungan sebelumnya"
 rm -f *.sge
-rm -f `pwd`/${NAMAKERJA}.out
+rm -f $(pwd)/${NAMAKERJA}.out
 rocks run host "rm -rf $(pwd);mkdir -p $(pwd)"
 
 case ${KERJANYA} in
+ff8) 
+echo "Mengolah input Firefly " $1
+echo "Cek ketersediaan nodes"
+SCRATCHDIR=/state/partition1/tmp/$USER/ff8/$SMNT
+mkdir -p $SCRATCHDIR
+input=$NAMAKERJA
+cp -rf $(pwd)/* /share/apps/kerja/${USER}/${SMNT}
+rm -f  $(pwd)/hasil$NAMAKERJA
+ln -s /share/apps/kerja/${USER}/${SMNT} $(pwd)/hasil$NAMAKERJA
+echo "Penyusunan runner script"
+cat > $SMNT.sge << EOF
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N ${NAMAKERJA} 
+#$ -pe mpich 24
+mkdir -p $SCRATCHDIR
+mkdir -p $(pwd)
+cd $(pwd)
+MY_HOST=\`hostname\`
+MY_DATE=\`date\`
+echo "Menjalankan Firefly 8 di \$MY_HOST pada \$MY_DATE"
+mv /share/apps/kerja/${USER}/${SMNT}/* $(pwd) 
+/share/apps/ff800/firefly8 -r -f -p -stdext -i  $(pwd)/$1 -o $(pwd)/${NAMAKERJA}.out -ex /share/apps/ff800 -t ${SCRATCHDIR} -p4pg /share/apps/ff800/procgrp 
+cp -rf $(pwd)/* /share/apps/kerja/${USER}/${SMNT}
+EOF
+;;
 g09) 
 echo "Mengolah input Gaussian 09" $1
 echo "Cek ketersediaan nodes"
@@ -449,7 +504,7 @@ echo "Mengatur proses penyimpanan file temporary (hanya berlaku untuk QE dan G03
 cat >> $SMNT.sge << EOF
 # Penyimpanan file temporary
 tar -cjf \`pwd\`/${NAMAKERJA}_scratch.tbz ${SCRATCHDIR} *
-scp \`pwd\`/${NAMAKERJA}_scratch.tbz hpc:\`pwd\`/
+#scp \`pwd\`/${NAMAKERJA}_scratch.tbz hpc:\`pwd\`/
 rm -rf $SCRATCHDIR 
 EOF
 else
