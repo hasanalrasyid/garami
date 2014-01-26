@@ -1,0 +1,16 @@
+# B3LYP/3-21G ADMP Geom=Crowd
+
+Dissociation of H2CO --> H2 + CO
+ 
+0 1
+C
+O 1 r1
+H 1 r2 2 a
+H 1 r3 3 b 2 180.
+ 
+r1 1.15275608
+r2 1.74415774
+r3 1.09413376
+a 114.81897892
+b 49.08562961
+                

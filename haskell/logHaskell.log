@@ -1,0 +1,449 @@
+==operator
+a:b	a adalah Character, b adalah [Character] menghasilkan [Character] yang
+berisi a,b1,b2,b3,b4...
+
+*Main> :type  (:)
+(:) :: a -> [a] -> [a]
+
+*Main> :info :
+data [] a = ... | a : [a]       -- Defined in `GHC.Types'
+infixr 5 :
+
+a++b menggabungkan 2 string
+
+break suatuFungsiUntukBreak suatuList
+dengan suatuFungsiUntukBreak :: Char -> Bool atau :: TipeAnggotaSuatuList -> Bool
+dan break menghasilkan pair/2 tuple ([prefix],[suffix])
+
+untuk List:
+head tail
+init last
+length
+null
+++ menggabungkan 2 List
+concat mengubah [[1,2],[3,4]] menjadi [1,2,3,4]
+reverse
+all suatuFungsiPredikat suatuList : dengan suatuFungsiPredikat :: TipeAnggotaSuatuList -> Bool, all menghasilkan True if all OK
+any bekerja seperti all, tapi True jika minimal 1 anggota List OK
+take jumlahInt suatuList menghasilkan List baru berisi jumlahInt dari awal suatuList
+drop seperti take tapi menghapus se-jumlahInt dari awal suatuList
+takeWhile adalah take dengan predikat (seperti all)
+dropWhile
+span even [2,4,6,7,4,2,3,1] == ([2,4,6],[7,4,2,3,1]) masukkan i ke dalam tuple1 sepanjang i memenuhi predikat (even)
+break even [1,7,5,3,2,4,6,7,4,2,3,1] == ([1,7,5,3],[2,4,6,7,4,2,3,1]) masukkan i ke dalam tuple1, sepanjang belum terpenuhi predikat
+elem needle haystackList cek apakah needle dalam haystackList
+notElem
+filter fungsiPredikat suatuList menghasilkan List yang berisi anggota suatuList yang memenuhi fungsiPredikat
+isPrefixOf, isInfixOf, isSuffixOf: kudu sesuai urutannya isInfixOf "ol" "haloala" == False, kalau "halola" True
+zip suatuList lainList == [(s1,l1),(s2,l2),(s3,l3)....(sn,ln)] dengan n terkecil antara nL dan nS
+zipWith fungsiAplikasi sList lList == List yang terdiri dari fungsiApliasi si li ada sampai zipWith7
+lines membagi string menjadi [String] berdasarkan \n
+unlines kebalikan lines
+words seperti lines yang berdasarkan whitespace
+unwords
+========================hal 94
+
+
+
+
+==data
+data BookInfo = Book Int String [String]
+data : deklarasi suatu datatype (semacam struct tapi lebih flexibel), 
+type constructor harus diawali huruf besar contoh: data BookInfo = ....
+value/data constructor harus diawali huruf besar contoh : ... = Book ....
+component / fields  berisi tipe data penyusun BookInfo
+
+jadi kita bisa pasang suatu variabel myBook (huruf kecil awalnya), 
+dengan tipe data BookInfo dengan memakai data constructor Book, contoh:
+
+myBook = Book 123 "Mari Menulis" ["Hasan","Eka"]
+
+ini agak beda dengan di bahasa lain, kita pakai dengan: 
+BookInfo myBook;
+myBook = 123 "Mari Menulis" ["Hasan","Eka"]
+
+Bahasa lain data constructor dijalankan implisit bersama dengan deklarasi
+type variabel myBook
+BookInfo myBook,
+di Haskell, type dideklarasikan implisit bersama dengan assigning variabel:
+myBook = Book 123 "Mari Menulis" ["Hasan","Eka"]
+
+thus perlu Book sebagai data constructor. Sebab tipe myBook tidak
+dideklarasikan di awal (mis. BookInfo myBook).
+
+Rumus umum:
+data KonstruktorTipe = KonstruktorData Tipe1 Tipe2 Tipe3 Tipe4 ...
+namaVariabel = KonstruktorData data1 data2 data3 data4 ...
+
+
+
+!extend
+data Bool = True | False
+maksudnya ada datatype Bool yang terdiri dari satu data (mis. data Kadal =
+KonstruktorKadal Int)
+namun dapat dikonstruksi oleh 2 konstruktor, antara True atau jika tidak, False.
+catatan: di sini True dan False adalah data Konstruktor, bukan data value.
+Masalah lain jika data Konstruktor True/False menghasilkan nilai true dan
+false. Lebih baik cek BillingInfo
+
+!extend
+
+data .... = .....
+	deriving(Eq,Show)
+
+Eq: agar bisa dilakukan operasi (==)
+Show: agar bisa diprint dalam ghci
+
+==type 
+deklarasi sinonim, mis. 
+type CustomerID = Int
+type BookRecord = (BookInfo,BookReview)
+
+artinya CustomerID adalah tipe Int, dan BookRecord adalah tuple
+(BookInfo,BookReview)
+
+type berguna untuk memperjelas konteks, mis.
+
+type CardHolder = String
+type CardNumber = String
+type Address = [String]
+data BillingInfo = CreditCard CardNumber CardHolder Address
+
+ini lebih baik dari:
+data BillingInfo = CreditCard String String [String]
+
+== data dan type
+
+BillingInfo dapat diextend, saat ini BillingInfo memiliki data konstruktor
+CreditCard saja, yang tersusun atas 2 String dan 1 list [String]
+kita bisa definisikan bahwa BillingInfo juga dapat dikonstruksi oleh Invoice,
+dan CashOnDelivery. mis.
+
+data BillingInfo = 
+	CreditCard String String [String]
+	| CashOnDelivery
+	| Invoice CustomerID
+	deriving (Show)
+
+
+== data vs tuple
+myBook = Book 123 "Mari Menulis" ["Hasan","Eka"]
+lebih baik dari
+myBook = (123, "Mari Menulis" ,["Hasan","Eka"])
+
+sebab dengan tupel, maka tipe untuk 
+myBook = (123, "Mari Menulis" ,["Hasan","Eka"])
+dan
+myHome = (11, "Gubuk" ,["Kursi","Meja"])
+akan SAMA, dan bisa muncul kondisi:
+myHouse = (121, "Bahasa Indonesia 1A",["Meja","Kursi","Sofa","Tempat Tidur"])
+
+contoh paling kelihatan:
+data Cartesian2D = 
+	Cartesian2D Double Double
+	deriving (Eq, Show)
+-- Angle and distance (magnitude).
+data Polar2D = 
+	Polar2D Double Double
+	deriving (Eq, Show)
+
+koordinat1 = Cartesian2D 3.14 1.0
+koordinat2 = Polar2D 3.14 1.0
+
+maka jika kita lakukan koordinat1 == koordinat2 ,  akan keluar error karena
+(==) harus memiliki tipe sama.
+lain dengan tupel, jika:
+koordinat1 = (3.14,1.0)
+koordinat2 = (3.14,1.0)
+maka koordinat1 == koordinat2 menghasilkan True
+
+== variabel tak pernah berubah, fungsi bisa didefinisikan sesuai dengan
+variabelnya
+
+x = 1
+x = 21
+
+ini error, sebab variabel x telah didefinisikan sebelumnya sebagai 1.
+
+myNot True = False --pertama
+myNot False = True --kedua
+
+ini boleh, dengan begini, jika myNot di run dengan variabel yang nilainya
+False, maka hanya kedua yang dijalankan
+
+x = False
+myNot x 
+
+menghasilkan True (--kedua)
+
+!extend
+sumList (x:parax)= x + sumList parax
+sumlist [] = 0
+
+harus urut, sebab test atas variabel diurut dari yang teratas (x:parax) turun
+hingga []
+
+bisa pula:
+ 
+bookTitle (Book id title authors) = title -- deklarasi aksesor untuk title
+myInfo = Book 203123 "Aku" ["Chairil Anwar","teman-temannya"]
+
+maka:
+bookTitle myInfo 
+menghasilkan: "Aku"
+
+!extend
+bookTitle (Book _ title _) = title -- deklarasi aksesor untuk title
+
+_ maksudnya tidak peduli dengan bagian yang ini, jadi tak usah diberi nama
+variabel, dan tidak diassign sebagai variabel. Hal ini bisa menghindari
+variabel tak terpakai (potensi bug).
+
+dengan ini lebih baik jika kita lakukan:
+sumList (x:xs) = x + sumList xs
+sumList _ = 0
+
+== data construction + accessor
+--record syntax
+data Customer = 
+	Customer {
+		customerID  :: CustomerID
+	 	, customerName :: String
+		, customerAddress :: Address
+	} deriving (Show)
+
+ini identik dengan:
+--application syntax
+data Customer = Customer Int String [String]
+	deriving (Show)
+
+customerID :: Customer -> Int
+customerID (Customer id _ _) = id
+
+customerName :: Customer -> String
+customerName (Customer _ name _) = name
+
+customerAddress :: Customer -> [String]
+customerAddress (Customer _ _ address) = address
+
+========================================================
+--record syntax
+customer2 = Customer {
+	customerID = 271828
+	, customerAddress = ["1048576 Disk Drive","Milpitas, CA 95134","USA"]
+	, customerName = "Jane Q. Citizen"
+}
+
+identik dengan:
+--application syntax
+customer1 = Customer 271828 "J.R. Hacker"
+["255 Syntax Ct",
+"Milpitas, CA 95134",
+"USA"]
+
+== Parameterized Type
+
+kadal (x:xs) = xs --cek1
+
+parameter untuk kadal bertipe List yang tipe pernyusunnya bisa bermacam-macam, bisa
+[Int], [Bool], [Char] atau apapun. tipe parameter tetap List
+
+kita bisa susun fungsi kadal agar menerima parameter bermacam-macam (bukan
+hanya List). mis.
+
+data Maybe a = 
+	Just a
+	| Nothing
+
+bisa pula digunakan untuk deklarasi fungsi yang menghasilkan beberapa
+kemungkinan tipe (mirip konstruksi data yang bisa beberapa konstruktor di atas)
+
+safeSecond :: [a] -> Maybe a -- menyatakan bahwa keluarannya suatu tipe a (sama dengan tipe penyusun list yang menjadi parameternya), bisa pula tipe yang lain
+
+safeSecond [] = Nothing 	-- keluarannya tipe Maybe a
+safeSecond xs = if null (tail xs) 
+	then Nothing									-- keluarannya tipe Maybe a jika null
+	else Just (head (tail xs))		-- keluarannya 
+
+
+di sini, a adalah parameter sebagai tipe (bukan seperti parameter biasa di --cek1 )
+
+
+==tipe rekursif
+
+data Pohon a = Node a (Pohon a) (Pohon a)
+	| Empty
+	deriving (Show)
+
+pohonSederhana = Node "utama" (Node "kiri" Empty Empty) (Node "kanan" Empty Empty)
+
+==variabel local
+
+dalam suatu fungsi bisa didefinisikan suatu variabel lokal dengan let, mis:
+-- file: ch03/Lending.hs
+reserve = 3999
+lend amount balance = 
+	let 
+		reserve = 100
+		newBalance = balance - amount
+	in 
+		if balance < reserve
+		then Nothing
+		else Just newBalance
+
+di sini akan menghasilkan:
+*Main> lend 50 90
+Nothing
+*Main> lend 50 100
+Just 50
+*Main> reserve 
+3999
+
+iDengan demikian, let bisa menghandle scope dan secara otomatis bisa menangani sesuai dengan
+scopenya.
+bar = let x = 1
+	in ((let x = "foo" in x), x)
+
+menhasilkan:
+("foo",1)
+
+dan bisa mengoverride tipe dan nilai parameter fungsi:
+quux a = let a = "foo"
+	in a ++ "eek!"
+
+di sini, quux bisa mengambil parameter bertipe apapun, dan menghasilkan
+keluaran [Char] "fooeek!"
+
+!extend where
+lend amount balance = 
+	let 
+		reserve = 100
+		newBalance = balance - amount
+	in 
+		if balance < reserve
+		then Nothing
+		else Just newBalance
+
+identik dengan:
+lend amount balance = 
+		if balance < reserve
+		then Nothing
+		else Just newBalance
+	where	
+		reserve = 100
+		newBalance = balance - amount
+
+bentuk where lebih menarik sebab menampilkan fokus pada fungsi, bukan pada
+local vars.
+
+dan seperti diketahui, local variable bisa diextend menjadi local function,
+mis.
+
+pluralise :: String -> [Int] -> [String]
+pluralise word counts = map plural counts
+	where 
+		plural 0 = "no " ++ word ++ "s"
+		plural 1 = "one " ++ word
+		plural n = show n ++ " " ++ word ++ "s"
+
+== Aturan Offside dan spasi (indent)
+jelas
+
+==case
+
+bentuk :
+fungsikadal param1 param2 = 
+  case param2 of
+    Nothing -> param1
+    Just param2 -> param2
+
+contoh lain:
+
+data Fruit = Apple | Orange
+apple = "apple"
+orange = "orange"
+whichFruit :: String -> Fruit
+whichFruit f = case f of
+"apple" -> Apple    -- Pastikan di mereka berdua dalam bentuk string, bukan apple tanpa petik
+"orange" -> Orange
+
+
+== guards
+sebelumnya kita bisa susun beberapa alternatif data konstruktor (lihat BillingInfo), kini kita bisa susun 
+beberapa alternatif parameter.
+
+mis. asalnya:
+myDrop n xs = 
+  if n <= 0 || null xs
+  then xs
+  else myDrop (n - 1) (tail xs)
+
+dengan guards bisa menjadi:
+myDrop n xs | n <= 0 = xs
+myDrop _ [] = []
+myDrop n (_:xs) = myDrop (n - 1) xs
+
+mungkin juga bisa menjadi:
+myDrop n xs | n <= 0 | xs == [] = xs -- ndak bisa begini... setiap | harus dalam bentuk expresi = hasil
+myDrop n xs 
+  | n <= 0 = xs
+  | xs == [] = xs
+myDrop n (_:xs) = myDrop (n - 1) xs
+
+*Main> :type myDrop 
+myDrop :: (Eq a1, Num a, Ord a) => a -> [a1] -> [a1]
+
+atau alternatifnya:
+myDrop n xs | n <= 0 = xs
+myDrop   _ [] = []
+myDrop n (_:xs) = myDrop (n - 1) xs
+
+*Main> :type myDrop 
+myDrop :: (Num a, Ord a) => a -> [t] -> [t]
+
+=========================================start 02.hs==========================================
+import System.Environment (getArgs)
+  interactWith function inputFile outputFile = do
+  input <- readFile inputFile
+writeFile outputFile (function input)
+  main = mainWith myFunction
+  where mainWith function = do
+  args <- getArgs
+  case args of
+  [input,output] -> interactWith function input output
+  _ -> putStrLn "error: exactly two arguments needed"
+  -- replace "id" with the name of our function below
+  myFunction = id
+----di atas ini tidak mungkin jalan karena tab nya ngaco
+-- ini bakal jalan
+
+import System.Environment (getArgs)
+
+interactWith function inputFile outputFile = do
+    input <- readFile inputFile
+    writeFile outputFile (function input)
+        
+main =  mainWith myFunction           -- ada fungsi baru namanya mainWith dengan parameter myFunction
+        where mainWith function = do  -- definisi fungsi lokal mainWith (parameternya function) --X--
+                args <- getArgs       -- indentasi masuk karena dalam scope definisi mainWith
+                case args of
+                  [input,output] -> interactWith function input output -- indent baru karena dalam scope case
+                  _ -> putStrLn "error: exactly two arguments needed"
+              -- replace "id" with the name of our function below 
+              myFunction = id     -- indent setara mainWith di --X-- karena myFunction adalah local setara mainWith dalam scope where
+                                  -- myFunction tak boleh lebih masuk karena jadinya bakal dalam scope mainWith --X--
+
+==infix
+elem 3 [1,3,2,1,2,2]
+True
+identik dengan
+3 `elem` [1,3,2,1,2,2]
+
+==bekerja dengan list
+if length xs > 0 .... -- ini tidak disukai sebab list xs bisa suatu baris tak hingga
+if not (null xs) -- lebih disukai, tinggal membalik skenario di atas
+
+== fungsi parsial= fungsi yang memproses sebagian dari suatu semesta input, lawan dari fungsi total. mis. head, hanya mampu memproses List, tidak dapat memproses tipe data lain atau tuple.
+
+
+
