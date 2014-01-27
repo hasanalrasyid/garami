@@ -16,7 +16,7 @@ module GaramiData where
                 }
   
   
-  gatotkaca = Antrian "gatotkaca" "12" "14G" 
+  gatotkaca = Antrian "gatotkaca" "12" "14GB" 
   
 
   fungsiHelp = 
