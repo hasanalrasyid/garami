@@ -51,7 +51,7 @@ main = do
               system "chmod -R g+rwx `pwd`"
               interactWith antrian input
               putStrLn ("Pengiriman ke dalam sistem antrian " ++ antrian)
-              system "qsub *.sge"
+              system ("qsub " ++ antrian ++ " *.sge")
               return ()
             _ -> do
               putStrLn fungsiHelp
