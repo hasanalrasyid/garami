@@ -1,3 +1,4 @@
+-- Modul untuk penanganan NWChem
 module GaramiNW where  
   import System.Environment (getArgs)
   import Text.Regex.Posix -- untuk =~
