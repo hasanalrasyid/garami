@@ -39,13 +39,16 @@ main = do
           putStrLn "Ganesha Advanced Resource Management Interface (GARAMI) 2.0.0"
           putStrLn "============================================================="
           putStrLn ""
-          system "rm -f *.grm.in"
-          system "rm -f *.sge"
-          system "chmod -R g+rwx `pwd`"
           args <- getArgs
           case args of
+            ["list"] -> do
+              system "qstat -f -u '*'"
+              return ()
             [antrian,input] -> do 
               putStrLn "Penyusunan Jobscript"
+              system "rm -f *.grm.in"
+              system "rm -f *.sge"
+              system "chmod -R g+rwx `pwd`"
               interactWith antrian input
               putStrLn ("Pengiriman ke dalam sistem antrian " ++ antrian)
               system "qsub *.sge"
@@ -53,11 +56,3 @@ main = do
             _ -> do
               putStrLn fungsiHelp
 
-fungsiHelp = 
-    "Jalankan program ini dengan perintah:" ++ "\n" ++
-    "garami jenisAntrian inputfile" ++ "\n" ++
-    "contoh:" ++ "\n" ++
-    "garami gatotkaca filesaya.g09" ++ "\n" ++
-    "GARAMI 2.0.0 \n" ++
-    "Daftar Aplikasi : .g09\n" ++
-    "Daftar Antrian : Gatotkaca \n"

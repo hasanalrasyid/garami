@@ -18,3 +18,12 @@ module GaramiData where
   
   gatotkaca = Antrian "gatotkaca" "12" "14" 
   
+
+  fungsiHelp = 
+    "Jalankan program ini dengan perintah:" ++ "\n" ++
+    "garami jenisAntrian inputfile" ++ "\n" ++
+    "contoh:" ++ "\n" ++
+    "garami gatotkaca filesaya.g09" ++ "\n" ++
+    "GARAMI 2.0.0 \n" ++
+    "Daftar Aplikasi : .g09\n" ++
+    "Daftar Antrian : Gatotkaca \n"
