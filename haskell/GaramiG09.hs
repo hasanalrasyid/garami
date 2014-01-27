@@ -34,7 +34,7 @@ module GaramiG09 where
     "#$ -pe mpich " ++ (nProc j) ++ "\n" ++
     "export g09root=/share/apps" ++ "\n" ++
     "source $g09root/g09/bsd/g09.profile" ++ "\n" ++
-    "export GAUSS_SCRDIR=/state/partition1/g09/" ++ t ++ "\n" ++
+    "export GAUSS_SCRDIR=/state/partition1/tmp/g09/" ++ t ++ "\n" ++
     "rm -rf $GAUSS_SCRDIR" ++ "\n" ++
     "mkdir -p $GAUSS_SCRDIR" ++ "\n" ++
     "MY_HOST=$(hostname)" ++ "\n" ++
