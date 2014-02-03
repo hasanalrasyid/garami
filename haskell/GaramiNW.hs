@@ -12,7 +12,7 @@ module GaramiG09 where
   -- i : String : namafile yang sudah tanpa .g09
   -- t : String : random string yang jadi penanda folder
   -- p : String : isi file g09 yang perlu disesuaikan
-  susunG09  j i t p = 
+  susunNW  j i t p = 
     unlines [
       "%NoSave ",  
       "%Chk=/state/partition1/tmp/g09/" ++ t  ++ "/" ++ i ++ ".chk" ,
@@ -26,7 +26,7 @@ module GaramiG09 where
   -- j: Antrian : jenis antrian
   -- i: String: namafile yang sudah tanpa g09
   -- t: String: random yang jadi penanda folder scratc
-  susunSGE j i t =
+  susunNWsge j i t =
     unlines [ 
       "#!/bin/bash", 
       "### Change to the current working directory:" ,

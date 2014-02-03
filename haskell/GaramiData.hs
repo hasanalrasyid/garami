@@ -18,6 +18,9 @@ module GaramiData where
   
   gatotkaca = Antrian "gatotkaca" "12" "14GB" 
   
+  k1d3 (x,_,_) = x
+  k2d3 (_,x,_) = x
+  k3d3 (_,_,x) = x
 
   fungsiHelp = 
     unlines [ 

@@ -16,7 +16,7 @@ interactWith jenisAntrian inputFile = do
     input <- readFile inputFile   -- baca inputFile as variabel input
     tempFile <- susunRandom
     writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
-    writeFile (tempFile ++ ".sge") (susunSGE antrian namaFile tempFile)  -- menyusun File.sge
+    writeFile (tempFile ++ ".sge") (susunG09sge antrian namaFile tempFile)  -- menyusun File.sge
     -- ? run jobscript.sge masuk antrian dengan sge
 --    ExitStatus <- runProcess "echo + > kadalijo" [] []
     where namaFile = intercalate "." (init (splitOn "." inputFile ))

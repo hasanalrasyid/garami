@@ -26,7 +26,7 @@ module GaramiG09 where
   -- j: Antrian : jenis antrian
   -- i: String: namafile yang sudah tanpa g09
   -- t: String: random yang jadi penanda folder scratc
-  susunSGE j i t =
+  susunG09sge j i t =
     unlines [ 
       "#!/bin/bash", 
       "### Change to the current working directory:" ,
@@ -35,7 +35,7 @@ module GaramiG09 where
       "#$ -V -N " ++ i ,
       "#$ -pe mpich " ++ (nProc j) ,
       "export g09root=/share/apps" ,
-      "source $g09root/g09/bsd/g09.profile",
+      "source $g09root/g09.profile",
       "export GAUSS_SCRDIR=/state/partition1/tmp/g09/" ++ t ,
       "rm -rf $GAUSS_SCRDIR" ,
       "mkdir -p $GAUSS_SCRDIR", 
