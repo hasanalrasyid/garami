@@ -1,4 +1,8 @@
 int main(){
   setuid(geteuid());
-  system("/path/to/send-incoming-email.sh");
+//  seteuid(504);
+//  setgid(504);
+//  setegid(504);
+  system("/home/localuser/test/g09/coba.sh");
+  return 0;
 }

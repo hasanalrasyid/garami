@@ -34,6 +34,8 @@ module GaramiG09 where
       "### Job name:" ,
       "#$ -V -N " ++ i ,
       "#$ -pe mpich " ++ (nProc j) ,
+      "export g09root=/share/apps",
+      "source $g09root/g09.profile",
       "export GAUSS_SCRDIR=/state/partition1/tmp/g09/" ++ t ,
       "rm -rf $GAUSS_SCRDIR" ,
       "mkdir -p $GAUSS_SCRDIR", 
