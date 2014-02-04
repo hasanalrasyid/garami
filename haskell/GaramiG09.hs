@@ -42,8 +42,7 @@ module GaramiG09 where
       "MY_HOST=$(hostname)" ,
       "MY_DATE=$(date)" ,
       "echo \"Menjalankan gaussian di $MY_HOST pada $MY_DATE\"" ,
-      "g09 " ++ t ++ ".grm.in " ++ i ++ ".log" ,
-      "formchk -3 /state/partition1/tmp/g09/" ++ t ++ "/" ++ i ++ ".chk /state/partition1/tmp/g09/" ++ t ++ "/" ++ i ++ ".fchk" ,
+      "g09runner " ++ i ++ " " ++ t  ,
       "rm -f " ++ i ++ ".scratch.tbz" ,
       "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/g09/" ++ t
     ]
