@@ -30,5 +30,5 @@ module GaramiData where
       "garami gatotkaca filesaya.g09", 
       "GARAMI 2.0.0" ,
       "Daftar Aplikasi : .g09",
-      "Daftar Antrian : Gatotkaca "
+      "Daftar Antrian : gatotkaca "
     ]
