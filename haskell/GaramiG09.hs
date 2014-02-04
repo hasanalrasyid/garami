@@ -34,15 +34,14 @@ module GaramiG09 where
       "### Job name:" ,
       "#$ -V -N " ++ i ,
       "#$ -pe mpich " ++ (nProc j) ,
-      "export g09root=/share/apps" ,
-      "source $g09root/g09.profile",
       "export GAUSS_SCRDIR=/state/partition1/tmp/g09/" ++ t ,
       "rm -rf $GAUSS_SCRDIR" ,
       "mkdir -p $GAUSS_SCRDIR", 
+      "chmod -R oug+rwx $GAUSS_SCRDIR", 
       "MY_HOST=$(hostname)" ,
       "MY_DATE=$(date)" ,
       "echo \"Menjalankan gaussian di $MY_HOST pada $MY_DATE\"" ,
-      "g09runner " ++ i ++ " " ++ t  ,
+      "/share/apps/g09runner " ++ i ++ " " ++ t  ,
       "rm -f " ++ i ++ ".scratch.tbz" ,
       "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/g09/" ++ t
     ]
