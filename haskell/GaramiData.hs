@@ -16,7 +16,10 @@ module GaramiData where
                 }
   
   
-  gatotkaca = Antrian "gatotkaca" "12" "14GB" 
+  gatotkaca = Antrian "gatotkaca" "24" "12GB" 
+  antasena = Antrian "antasena" "12" "6GB" 
+  antareja = Antrian "antareja" "6" "3GB" 
+  srenggini = Antrian "srenggini" "4" "2GB" 
   
   k1d3 (x,_,_) = x
   k2d3 (_,x,_) = x
@@ -30,5 +33,5 @@ module GaramiData where
       "garami gatotkaca filesaya.g09", 
       "GARAMI 2.0.0" ,
       "Daftar Aplikasi : .g09",
-      "Daftar Antrian : gatotkaca "
+      "Daftar Antrian : gatotkaca antasena antareja srenggini"
     ]

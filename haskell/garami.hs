@@ -22,6 +22,9 @@ interactWith jenisAntrian inputFile = do
     where namaFile = intercalate "." (init (splitOn "." inputFile ))
           antrian = case jenisAntrian of
                       "gatotkaca" -> gatotkaca
+                      "antasena" -> antasena
+                      "antareja" -> antareja
+                      "srenggini" -> srenggini
                       _ -> gatotkaca
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
