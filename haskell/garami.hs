@@ -17,7 +17,7 @@ interactWith jenisAntrian inputFile = do
     input <- readFile inputFile   -- baca inputFile as variabel input
     tempFile <- susunRandom
     writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
-    writeFile (tempFile ++ ".sge") (susunG09sge antrian namaFile tempFile)  -- menyusun File.sge
+    writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
     -- ? run jobscript.sge masuk antrian dengan sge
 --    ExitStatus <- runProcess "echo + > kadalijo" [] []
     where namaFile = intercalate "." (init (splitOn "." inputFile ))
@@ -27,6 +27,9 @@ interactWith jenisAntrian inputFile = do
                       "antareja" -> antareja
                       "srenggini" -> srenggini
                       _ -> gatotkaca
+          aplikasisge = case (last (splitOn "." inputFile)) of
+                       "g09" -> susunG09sge
+                       "nwi" -> susunNWsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
                        "nwi" -> susunNW
@@ -56,7 +59,12 @@ main = do
               case (last (splitOn "." input)) of
                 "g09" -> do
                   interactWith antrian input
-                  putStrLn ("Pengiriman ke dalam sistem antrian " ++ antrian)
+                  putStrLn ("Pengiriman kerja Gaussian09 ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
+                "nwi" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja NwChem 6.3 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 _ -> do
