@@ -55,7 +55,7 @@ main = do
               putStrLn "Penyusunan Jobscript"
               system "rm -f *.grm.in"
               system "rm -f *.sge"
-              system "chmod -R g+rwx `pwd`"
+              system "chmod -fR g+rwx `pwd`"
               case (last (splitOn "." input)) of
                 "g09" -> do
                   interactWith antrian input
