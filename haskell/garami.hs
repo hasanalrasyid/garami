@@ -46,6 +46,7 @@ main = do
           putStrLn "Ganesha Advanced Resource Management Interface (GARAMI) 2.0.0"
           putStrLn "============================================================="
           putStrLn ""
+          putStrLn fungsiHelp 
           args <- getArgs
           case args of
             ["list"] -> do
@@ -68,7 +69,8 @@ main = do
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 _ -> do
-                  putStrLn fungsiHelp 
+                  putStrLn "File input tidak dikenal"
+                  return ()
             _ -> do
               putStrLn fungsiHelp
 

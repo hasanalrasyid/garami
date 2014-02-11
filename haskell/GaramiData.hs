@@ -32,6 +32,9 @@ module GaramiData where
       "contoh:" ,
       "garami gatotkaca filesaya.g09", 
       "GARAMI 2.0.0" ,
-      "Daftar Aplikasi : .g09",
-      "Daftar Antrian : gatotkaca antasena antareja srenggini"
+      "Daftar Aplikasi  ",
+      "   Gaussian09  : .g09",
+      "   NwChem 6.3  : .nwi",
+      "Daftar Antrian ",
+      "   gatotkaca antasena antareja srenggini"
     ]
