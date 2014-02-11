@@ -1,0 +1,23 @@
+start air 
+echo
+title "air"
+
+memory total 500 mb
+
+geometry units angstroms 
+zmatrix
+O 
+H1 1 1.1 
+H2 1 1.1 2 107.5
+end
+end
+
+basis
+* library 6-31G
+end
+
+scf
+  rhf
+end
+
+task scf optimize

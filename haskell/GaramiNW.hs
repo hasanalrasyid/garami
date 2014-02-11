@@ -1,4 +1,4 @@
-module GaramiG09 where  
+module GaramiNW where  
   import System.Environment (getArgs)
   import Text.Regex.Posix -- untuk =~
   import System.Process (system,runProcess)
@@ -9,22 +9,20 @@ module GaramiG09 where
   import GaramiData
 
   -- j : Antrian : jenis antrian yang aktif, mis. gatotkaca
-  -- i : String : namafile yang sudah tanpa .g09
+  -- i : String : namafile yang sudah tanpa .nwi
   -- t : String : random string yang jadi penanda folder
   -- p : String : isi file g09 yang perlu disesuaikan
   susunNW  j i t p = 
     unlines [
-      "%NoSave ",  
-      "%Chk=/state/partition1/tmp/g09/" ++ t  ++ "/" ++ i ++ ".chk" ,
-      "%NProcShared=" ++ (nProc j ) ,
-      "%Mem=" ++ (nMem j) ,
+      "memory total 500 mb", 
+      "scratch_dir /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
       unlines ( map gantiVar (lines p) )]
-    where gantiVar x = 
-            if ( x =~ "%" ) then ""
-                            else x
+    where gantiVar x =
+            if ( ( x =~ "memory " ) || (x =~ "scratch_dir ") ) then ""
+            else x
   
   -- j: Antrian : jenis antrian
-  -- i: String: namafile yang sudah tanpa g09
+  -- i: String: namafile yang sudah tanpa nwi 
   -- t: String: random yang jadi penanda folder scratc
   susunNWsge j i t =
     unlines [ 
@@ -34,16 +32,15 @@ module GaramiG09 where
       "### Job name:" ,
       "#$ -V -N " ++ i ,
       "#$ -pe mpich " ++ (nProc j) ,
-      "export g09root=/share/apps" ,
-      "source $g09root/g09/bsd/g09.profile",
-      "export GAUSS_SCRDIR=/state/partition1/tmp/g09/" ++ t ,
-      "rm -rf $GAUSS_SCRDIR" ,
-      "mkdir -p $GAUSS_SCRDIR", 
+      "DAFTAR=$(hostname)",
+      "export LD_LIBRARY_PATH=/opt/mpich2/gnu/lib:$LD_LIBRARY_PATH",
+      "export NWCHEM_TOP=/share/apps/nwchem-6.3",
+      "export NWCHEM_BASIS_LIBRARY=/share/apps/nwchem-6.3/src/basis/libraries/",
+      "rm -rf /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
+      "mkdir -p /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
       "MY_HOST=$(hostname)" ,
       "MY_DATE=$(date)" ,
-      "echo \"Menjalankan gaussian di $MY_HOST pada $MY_DATE\"" ,
-      "g09 " ++ t ++ ".grm.in " ++ i ++ ".log" ,
-      "formchk -3 /state/partition1/tmp/g09/" ++ t ++ "/" ++ i ++ ".chk /state/partition1/tmp/g09/" ++ t ++ "/" ++ i ++ ".fchk" ,
-      "rm -f " ++ i ++ ".scratch.tbz" ,
-      "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/g09/" ++ t
+      "echo \"Menjalankan NwChem di $MY_HOST pada $MY_DATE\"" ,
+      "/opt/mpich2/gnu/bin/mpirun -np " ++ (nProc j) ++ " -host $DAFTAR /share/apps/nwchem-6.3/bin/LINUX64/nwchem " ++ t ++ ".grm.in  &> " ++ i ++ ".log",
+      "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/nwchem/" ++ t
     ]

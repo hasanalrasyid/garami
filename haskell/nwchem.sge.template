@@ -1,0 +1,13 @@
+#!/bin/bash
+### Change to the current working directory:
+#$ -cwd
+### Job name:
+#$ -V -N kadal 
+#$ -pe mpich 24 
+DAFTAR=$(sort -u $TMPDIR/machines | paste -s -d "," )
+DAFTAR=$(hostname)
+export LD_LIBRARY_PATH=/opt/mpich2/gnu/lib:$LD_LIBRARY_PATH
+export NWCHEM_TOP=/share/apps/nwchem-6.3
+export NWCHEM_BASIS_LIBRARY=/share/apps/nwchem-6.3/src/basis/libraries/
+/opt/mpich2/gnu/bin/mpirun -np 24 -host $DAFTAR /share/apps/nwchem-6.3/bin/LINUX64/nwchem tmp.in &> jnh9rwEO5.log
+

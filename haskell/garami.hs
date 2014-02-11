@@ -7,6 +7,7 @@ import Data.List (intercalate)
 import Data.List.Split (splitOn)
 import GaramiData
 import GaramiG09
+import GaramiNW
 
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
@@ -28,7 +29,7 @@ interactWith jenisAntrian inputFile = do
                       _ -> gatotkaca
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
-                       _ -> susunG09
+                       "nwi" -> susunNW
 
 susunRandom = do
     values <- evalRandIO (sequence (replicate 10 (getRandomR (97,122))))
@@ -52,10 +53,14 @@ main = do
               system "rm -f *.grm.in"
               system "rm -f *.sge"
               system "chmod -R g+rwx `pwd`"
-              interactWith antrian input
-              putStrLn ("Pengiriman ke dalam sistem antrian " ++ antrian)
-              system ("qsub -q " ++ antrian ++ ".q *.sge")
-              return ()
+              case (last (splitOn "." input)) of
+                "g09" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
+                _ -> do
+                  putStrLn fungsiHelp 
             _ -> do
               putStrLn fungsiHelp
 
