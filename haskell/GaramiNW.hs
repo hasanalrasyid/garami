@@ -16,6 +16,7 @@ module GaramiNW where
     unlines [
       "memory total 500 mb", 
       "scratch_dir /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
+      "permanent_dir /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
       unlines ( map gantiVar (lines p) )]
     where gantiVar x =
             if ( ( x =~ "memory " ) || (x =~ "scratch_dir ") ) then ""
