@@ -16,7 +16,6 @@ import GaramiCustom
 --  lalu menyusun jobscript .sge (jobscript jenisAntrian input)
 --
 interactWith jenisAntrian inputFile = do
-    input <- readFile inputFile   -- baca inputFile as variabel input
     tempFile <- susunRandom
     writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
     case inputFile of 
@@ -24,6 +23,7 @@ interactWith jenisAntrian inputFile = do
                   putStrLn "Custom Apps, tidak ada file yang disusun"
                   return ()
       _ -> do
+           input <- readFile inputFile   -- baca inputFile as variabel input
            writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
     -- ? run jobscript.sge masuk antrian dengan sge
 --    ExitStatus <- runProcess "echo + > kadalijo" [] []
