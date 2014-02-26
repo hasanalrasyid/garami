@@ -18,7 +18,7 @@ module GaramiCustom where
       "### Change to the current working directory:" ,
       "#$ -cwd" ,
       "### Job name:" ,
-      "#$ -V -N " ++ i ,
+      "#$ -V -N Custom Apps by $USER" ,
       "#$ -pe mpich " ++ (nProc j) ,
       "MY_HOST=$(hostname)" ,
       "MY_DATE=$(date)" ,
