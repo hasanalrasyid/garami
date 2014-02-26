@@ -1,0 +1,27 @@
+! Bench 1                                                                       
+! This is a RHF/6-31G* run on silacyclopropane, with 61 AOs.                    
+! It comes from a study of cycloalkanes and silacycloalkanes by                 
+! J.A.Boatz, M.S.Gordon, and R.L.Hilderbrandt,                                  
+! J.Am.Chem.Soc., 1988, 110, 352-358.                                           
+!                                                                               
+! The FINAL energy is -368.0867960698 after 10 iterations,                      
+! running the SCF in direct mode.                                               
+!                                                                               
+! This run requires 150 seconds on a RS/6000-350                                
+! This run requires 1 Mbyte of disk storage.                                    
+!                                                                               
+ $CONTRL SCFTYP=RHF MPLEVL=2 RUNTYP=OPTIMIZE UNITS=ANGS $END                            
+ $SYSTEM TIMLIM=600 $END                                          
+ $SCF    DIRSCF=.True. $END                                                     
+ $GUESS  GUESS=HUCKEL   $END                                                    
+ $BASIS  GBASIS=N311 NGAUSS=6 NDFUNC=1 NPFUNC=1 $END                                      
+ $ELMOM  IEMOM=2 WHERE=COMASS $END                                              
+ $DATA                                                                          
+MP2/6-31G*//MP2/3-21G* silacyclopropane                                         
+Cnv      2                                                                      
+                                                                                
+SILICON    14.0     0.0           0.0           0.731921                        
+CARBON      6.0     0.0           0.893934     -0.936953                        
+HYDROGEN    1.0    -1.127947      0.0           1.537848                        
+HYDROGEN    1.0    -0.997288      1.349560     -1.319788                        
+ $END                                                                           

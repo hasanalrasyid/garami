@@ -8,6 +8,8 @@ import Data.List.Split (splitOn)
 import GaramiData
 import GaramiG09
 import GaramiNW
+import GaramiFF8
+import GaramiCustom
 
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
@@ -16,8 +18,13 @@ import GaramiNW
 interactWith jenisAntrian inputFile = do
     input <- readFile inputFile   -- baca inputFile as variabel input
     tempFile <- susunRandom
-    writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
     writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
+    case inputFile of 
+      "custom" -> do
+                  putStrLn "Custom Apps, tidak ada file yang disusun"
+                  return ()
+      _ -> do
+           writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
     -- ? run jobscript.sge masuk antrian dengan sge
 --    ExitStatus <- runProcess "echo + > kadalijo" [] []
     where namaFile = intercalate "." (init (splitOn "." inputFile ))
@@ -30,9 +37,13 @@ interactWith jenisAntrian inputFile = do
           aplikasisge = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09sge
                        "nwi" -> susunNWsge
+                       "ff8" -> susunFF8sge
+                       _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
                        "nwi" -> susunNW
+                       "ff8" -> susunFF8
+                       _ -> susunCustom
 
 susunRandom = do
     values <- evalRandIO (sequence (replicate 10 (getRandomR (97,122))))
@@ -58,6 +69,11 @@ main = do
               system "rm -f *.sge"
               system "chmod -fR g+rwx `pwd`"
               case (last (splitOn "." input)) of
+                "ff8" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja Firefly 8.0.1 ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
                 "g09" -> do
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Gaussian09 ke dalam sistem antrian " ++ antrian)
@@ -66,6 +82,11 @@ main = do
                 "nwi" -> do
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja NwChem 6.3 ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
+                "custom" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja Custom Apps ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 _ -> do

@@ -12,14 +12,15 @@ module GaramiData where
         Antrian {
                 nama :: String ,
                 nProc :: String ,
-                nMem :: String 
+                nMem :: String , 
+                nJam :: String 
                 }
   
   
-  gatotkaca = Antrian "gatotkaca" "24" "12GB" 
-  antasena = Antrian "antasena" "12" "6GB" 
-  antareja = Antrian "antareja" "6" "3GB" 
-  srenggini = Antrian "srenggini" "4" "2GB" 
+  gatotkaca = Antrian "gatotkaca" "24" "12GB" "719" 
+  antasena = Antrian "antasena" "12" "6GB" "167"
+  antareja = Antrian "antareja" "6" "3GB" "23"
+  srenggini = Antrian "srenggini" "4" "2GB" "4"
   
   k1d3 (x,_,_) = x
   k2d3 (_,x,_) = x
@@ -33,8 +34,9 @@ module GaramiData where
       "garami gatotkaca filesaya.g09", 
       "GARAMI 2.0.0" ,
       "Daftar Aplikasi  ",
-      "   Gaussian09  : .g09",
-      "   NwChem 6.3  : .nwi",
+      "   Gaussian09    : .g09",
+      "   NwChem 6.3    : .nwi",
+      "   Firefly 8.0.1 : .ff8",
       "Daftar Antrian ",
       "   gatotkaca antasena antareja srenggini"
     ]
