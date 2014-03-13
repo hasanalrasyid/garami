@@ -19,7 +19,7 @@ module GaramiNW where
       "permanent_dir /state/partition1/tmp/nwchem/" ++ t  ++ "/", 
       unlines ( map gantiVar (lines p) )]
     where gantiVar x =
-            if ( ( x =~ "memory " ) || (x =~ "scratch_dir ") ) then ""
+            if ( ( x =~ "memory " ) || (x =~ "scratch_dir ") || (x =~ "permanent_dir ")) then ""
             else x
   
   -- j: Antrian : jenis antrian
