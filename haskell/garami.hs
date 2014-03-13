@@ -20,7 +20,7 @@ interactWith jenisAntrian inputFile = do
     writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
     case inputFile of 
       "custom" -> do
-                  putStrLn "Custom Apps, tidak ada file yang disusun"
+                  putStrLn "Custom Apps, maka tidak ada file yang disusun"
                   return ()
       _ -> do
            input <- readFile inputFile   -- baca inputFile as variabel input
