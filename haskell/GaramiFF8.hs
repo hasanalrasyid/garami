@@ -45,6 +45,6 @@ module GaramiFF8 where
       "MY_HOST=$(hostname)" ,
       "MY_DATE=$(date)" ,
       "echo \"Menjalankan Firefly 8.0.1 di $MY_HOST pada $MY_DATE\"" ,
-      "mpirun -np " ++ (nProc j) ++ "/share/apps/ff801/firefly801 -r -f -p -stdext -prealloc:50 -i " ++ t ++ ".grm.in -o " ++ i ++ ".log -ex /share/apps/ff801 -t /state/partition1/tmp/ff8/" ++ t  ,
+      "mpirun -np " ++ (nProc j) ++ " /share/apps/ff801/firefly801 -r -f -p -stdext -prealloc:50 -i " ++ t ++ ".grm.in -o " ++ i ++ ".log -ex /share/apps/ff801 -t /state/partition1/tmp/ff8/" ++ t  ,
       "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/ff8/" ++ t
     ]
