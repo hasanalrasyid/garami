@@ -8,7 +8,7 @@ import System.Environment
 -- ?lalu ngerun outputfile masuk antrian (dengan qsub yang sesuai dengan jenis antrian)
 main = do 
           putStrLn "Ganesha Advanced Resource Management Interface (GARAMI) 2.0.0"
-          putStrLn "============================================================="
+          putStrLn "=============================================================="
           putStrLn ""
           args <- getArgs
           case args of
