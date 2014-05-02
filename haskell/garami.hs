@@ -10,6 +10,7 @@ import GaramiG09
 import GaramiNW
 import GaramiFF8
 import GaramiCustom
+import GaramiRebound
 
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
@@ -21,6 +22,9 @@ interactWith jenisAntrian inputFile = do
     case inputFile of 
       "custom" -> do
                   putStrLn "Custom Apps, maka tidak ada file yang disusun"
+                  return ()
+      "nbody.rbo" -> do
+                  putStrLn "Menjalankan program Rebound"
                   return ()
       _ -> do
            input <- readFile inputFile   -- baca inputFile as variabel input
@@ -38,6 +42,7 @@ interactWith jenisAntrian inputFile = do
                        "g09" -> susunG09sge
                        "nwi" -> susunNWsge
                        "ff8" -> susunFF8sge
+                       "rbo" -> susunReboundsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
@@ -61,7 +66,10 @@ main = do
           args <- getArgs
           case args of
             ["list"] -> do
-              system "qstat -f -u '*'"
+              system ("qstat -f -u '*' " ) 
+              return ()
+            ["list", antrian ] -> do
+              system ("qstat -f -u '*' " ++  "-q " ++ antrian ++ ".q") 
               return ()
             [antrian,input] -> do 
               putStrLn "Penyusunan Jobscript"
