@@ -59,7 +59,7 @@ main = do
           putStrLn "Ganesha Advanced Resource Management Interface (GARAMI) 2.0.0"
           putStrLn "============================================================="
           putStrLn ""
-          putStrLn fungsiHelp 
+--          putStrLn fungsiHelp 
           args <- getArgs
           case args of
             ["list"] -> do
