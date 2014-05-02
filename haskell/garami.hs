@@ -92,6 +92,11 @@ main = do
                   putStrLn ("Pengiriman kerja NwChem 6.3 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
+                "rbo" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja Rebound ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
                 "custom" -> do
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Custom Apps ke dalam sistem antrian " ++ antrian)
