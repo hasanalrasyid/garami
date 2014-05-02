@@ -90,6 +90,7 @@ main = do
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "rbo" -> do
+                  system ("touch " ++ input)
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Rebound ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
