@@ -37,6 +37,10 @@ module GaramiData where
       "   Gaussian09    : .g09",
       "   NwChem 6.3    : .nwi",
       "   Firefly 8.0.1 : .ff8",
-      "Daftar Antrian ",
-      "   gatotkaca antasena antareja srenggini"
+      "   Rebound       : .rbo (khusus user tertentu)",
+      "Daftar Antrian : ",
+      "   nama  gatotkaca antasena antareja srenggini",
+      "   core      24      12        6         4",
+      "   mem       12G     6G        3G        2G",
+      "   limit     1mo     1w        1d        4h"
     ]
