@@ -23,9 +23,6 @@ interactWith jenisAntrian inputFile = do
       "custom" -> do
                   putStrLn "Custom Apps, maka tidak ada file yang disusun"
                   return ()
-      "nbody.rbo" -> do
-                  putStrLn "Menjalankan program Rebound"
-                  return ()
       _ -> do
            input <- readFile inputFile   -- baca inputFile as variabel input
            writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
