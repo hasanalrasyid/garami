@@ -11,6 +11,7 @@ import GaramiNW
 import GaramiFF8
 import GaramiCustom
 import GaramiRebound
+import GaramiNAMD 
 
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
@@ -40,6 +41,7 @@ interactWith jenisAntrian inputFile = do
                        "nwi" -> susunNWsge
                        "ff8" -> susunFF8sge
                        "rbo" -> susunReboundsge
+                       "namd" -> susunNAMDsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
@@ -93,6 +95,12 @@ main = do
                   system ("touch " ++ input)
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Rebound ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
+                "namd" -> do
+                  system ("touch " ++ input)
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja NAMD ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "custom" -> do
