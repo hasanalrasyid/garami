@@ -31,7 +31,7 @@ module GaramiNAMD where
       "cp -r * $NAMD_SCRDIR",
       "cd $NAMD_SCRDIR",
       "/share/apps/namd/namd2 +p" ++ (nProc j) ++ " " ++ i ++ ".namd > ${KERJADIR}/" ++ i ++ ".log",
-      "tar -cjf " ++ i ++ ".tbz *",
+      "tar -cjf " ++ i ++ ".scratch.tbz *",
       "cp " ++ i ++ ".scratch.tbz ${KERJADIR}",
       "cd $KERJADIR",
       "rm -rf $NAMD_SCRDIR"
