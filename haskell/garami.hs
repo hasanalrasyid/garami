@@ -43,13 +43,13 @@ interactWith jenisAntrian inputFile = do
                        "ff8" -> susunFF8sge
                        "rbo" -> susunReboundsge
                        "namd" -> susunNAMDsge
-                       "pwi" -> susunNAMDsge
+                       "pwi" -> susunQEsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
                        "nwi" -> susunNW
                        "ff8" -> susunFF8
-                       "qe" -> susunFF8
+                       "qe" -> susunQE
                        _ -> susunCustom
 
 susunRandom = do
