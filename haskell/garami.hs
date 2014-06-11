@@ -12,6 +12,7 @@ import GaramiFF8
 import GaramiCustom
 import GaramiRebound
 import GaramiNAMD 
+import GaramiQE 
 
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
@@ -42,11 +43,13 @@ interactWith jenisAntrian inputFile = do
                        "ff8" -> susunFF8sge
                        "rbo" -> susunReboundsge
                        "namd" -> susunNAMDsge
+                       "pwi" -> susunNAMDsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
                        "nwi" -> susunNW
                        "ff8" -> susunFF8
+                       "qe" -> susunFF8
                        _ -> susunCustom
 
 susunRandom = do
@@ -84,6 +87,11 @@ main = do
                 "g09" -> do
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Gaussian09 ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
+                "pwi" -> do
+                  interactWith antrian input
+                  putStrLn ("Pengiriman kerja Quantum Espresso ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "nwi" -> do
