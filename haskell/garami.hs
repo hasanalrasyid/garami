@@ -43,7 +43,7 @@ interactWith jenisAntrian inputFile = do
                        "ff8" -> susunFF8sge
                        "rbo" -> susunReboundsge
                        "namd" -> susunNAMDsge
-                       "pwi" -> susunQEsge
+                       "qe" -> susunQEsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09
@@ -89,7 +89,7 @@ main = do
                   putStrLn ("Pengiriman kerja Gaussian09 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
-                "pwi" -> do
+                "qe" -> do
                   interactWith antrian input
                   putStrLn ("Pengiriman kerja Quantum Espresso ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")

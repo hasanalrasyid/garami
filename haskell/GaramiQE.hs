@@ -39,7 +39,7 @@ module GaramiQE where
             "MY_DATE=$(date)" ,
             "mkdir -p /state/partition1/tmp/qe/" ++ t ++ "/",
             "echo \"Menjalankan Quantum Espresso 5.0.99 di $MY_HOST pada $MY_DATE\"" ,
-            "#mpirun -n " ++ (nProc j) ++ " /share/apps/espresso-5.0.99/bin/pw.x < " ++ i ++ ".pwi > " ++ i ++ ".out " ,
+            "#mpirun -n " ++ (nProc j) ++ " /share/apps/espresso-5.0.99/bin/pw.x < " ++ i ++ ".qe > " ++ i ++ ".out " ,
             "rm -f " ++ i ++ ".scratch.tbz", 
             "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/qe/" ++ t ,
             "rm -rf /state/partition1/tmp/qe/" ++ t ++ "/",
