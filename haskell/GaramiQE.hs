@@ -25,7 +25,8 @@ module GaramiQE where
 -- j: Antrian : jenis antrian
 -- i: String: namafile yang sudah tanpa g09
 -- t: String: random yang jadi penanda folder scratc
-  susunQEsge j i t = 
+-- p: String: Nama program yang dirun, defaultnya adalah pw.x 
+  susunQEsge j i t p = 
     unlines [ 
             "#!/bin/bash", 
             "### Change to the current working directory:" ,
@@ -39,7 +40,7 @@ module GaramiQE where
             "MY_DATE=$(date)" ,
             "mkdir -p /state/partition1/tmp/qe/" ++ t ++ "/",
             "echo \"Menjalankan Quantum Espresso 5.0.99 di $MY_HOST pada $MY_DATE\"" ,
-            "mpirun -n " ++ (nProc j) ++ " /share/apps/espresso-5.0.99/bin/pw.x < " ++ i ++ ".qe > " ++ i ++ ".log " ,
+            "mpirun -n " ++ (nProc j) ++ " /share/apps/espresso-5.0.99/bin/" ++ p ++ " < " ++ i ++ ".qe > " ++ i ++ ".log " ,
             "rm -f " ++ i ++ ".scratch.tbz", 
             "tar -cjf " ++ i ++ ".scratch.tbz /state/partition1/tmp/qe/" ++ t ,
             "rm -rf /state/partition1/tmp/qe/" ++ t ++ "/",

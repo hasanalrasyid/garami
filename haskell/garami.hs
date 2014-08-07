@@ -5,6 +5,7 @@ import Control.Monad.Random (evalRandIO,getRandomR)
 import Data.Char (chr)
 import Data.List (intercalate)
 import Data.List.Split (splitOn)
+import Data.String.Utils (replace) 
 import GaramiData
 import GaramiG09
 import GaramiNW
@@ -18,9 +19,9 @@ import GaramiQE
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
 --  lalu menyusun jobscript .sge (jobscript jenisAntrian input)
 --
-interactWith jenisAntrian inputFile = do
+interactWith jenisAntrian inputFile namaProgram = do
     tempFile <- susunRandom
-    writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
+    writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile namaProgram)  -- menyusun File.sge
     case inputFile of 
       "custom" -> do
                   putStrLn "Custom Apps, maka tidak ada file yang disusun"
@@ -73,6 +74,17 @@ main = do
             ["list", antrian ] -> do
               system ("qstat -f -u '*' " ++  "-q " ++ antrian ++ ".q") 
               return ()
+            [antrian,input,program] -> do 
+              putStrLn "Penyusunan Jobscript"
+              system "rm -f *.grm.in"
+              system "rm -f *.sge"
+              system "chmod -fR g+rwx `pwd`"
+              case (last (splitOn "." input)) of
+                "qe" -> do
+                  interactWith antrian input program 
+                  putStrLn ("Pengiriman kerja Quantum Espresso ke dalam sistem antrian " ++ antrian)
+                  system ("qsub -q " ++ antrian ++ ".q *.sge")
+                  return ()
             [antrian,input] -> do 
               putStrLn "Penyusunan Jobscript"
               system "rm -f *.grm.in"
@@ -80,39 +92,39 @@ main = do
               system "chmod -fR g+rwx `pwd`"
               case (last (splitOn "." input)) of
                 "ff8" -> do
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja Firefly 8.0.1 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "g09" -> do
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja Gaussian09 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "qe" -> do
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja Quantum Espresso ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "nwi" -> do
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja NwChem 6.3 ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "rbo" -> do
                   system ("touch " ++ input)
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja Rebound ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "namd" -> do
                   system ("touch " ++ input)
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja NAMD ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
                 "custom" -> do
-                  interactWith antrian input
+                  interactWith antrian input [] 
                   putStrLn ("Pengiriman kerja Custom Apps ke dalam sistem antrian " ++ antrian)
                   system ("qsub -q " ++ antrian ++ ".q *.sge")
                   return ()
