@@ -18,7 +18,7 @@ module GaramiData where
   
   
   gatotkaca = Antrian "gatotkaca" "24" "12GB" "719" 
-  antasena = Antrian "antasena" "12" "6GB" "167"
+  antasena = Antrian "antasena" "12" "7GB" "167"
   antareja = Antrian "antareja" "6" "3GB" "23"
   srenggini = Antrian "srenggini" "4" "2GB" "4"
   
