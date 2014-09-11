@@ -19,9 +19,10 @@ module GaramiG09 where
       "%NProcShared=" ++ (nProc j ) ,
       "%Mem=" ++ (nMem j) ,
       unlines ( map gantiVar (lines p) )]
-    where gantiVar x = 
-            if ((x =~ "%") && not (x =~ "%OldChk")) then ""
-                            else x
+    where 
+          gantiVar x = if ((x =~ "%") && not (x =~ "%OldChk")) 
+                         then "" 
+                         else x
   
   -- j: Antrian : jenis antrian
   -- i: String: namafile yang sudah tanpa g09
