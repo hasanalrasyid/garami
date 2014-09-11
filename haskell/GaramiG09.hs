@@ -20,7 +20,7 @@ module GaramiG09 where
       "%Mem=" ++ (nMem j) ,
       unlines ( map gantiVar (lines p) )]
     where gantiVar x = 
-            if ( x =~ "%" ) then ""
+            if ((x =~ "%") || (x=~"%OldChk")) then ""
                             else x
   
   -- j: Antrian : jenis antrian
