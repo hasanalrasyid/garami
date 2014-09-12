@@ -44,7 +44,7 @@ interactWith jenisAntrian inputFile = do
                        "ff8" -> susunFF8sge
                        "rbo" -> susunReboundsge
                        "namd" -> susunNAMDsge
-                       "siesta" -> susunNAMDsge
+                       "siesta" -> susunSIESTAsge
                        "qe" -> susunQEsge
                        _ -> susunCustomsge
           aplikasi = case (last (splitOn "." inputFile)) of
