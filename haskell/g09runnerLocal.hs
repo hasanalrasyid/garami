@@ -13,7 +13,8 @@ main = do
           args <- getArgs
           case args of
             [namainput] -> do
-              kk <- readProcess "chmod" ["oug+rwx","`pwd`"] ""
+              dir <- readProcess "pwd" [] ""
+              kk <- readProcess "chmod" ["oug+rwx",init dir] ""
               totalEnv <- getEnvironment
               setUserID 504
               executeFile "/share/apps/g09/g09" False [(namainput ++ ".g09"),namainput ++ ".log"] (lingkungan totalEnv)
