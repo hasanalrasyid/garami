@@ -15,10 +15,10 @@ main = do
             [namainput] -> do
               dir <- readProcess "pwd" [] ""
               kk <- readProcess "chmod" ["oug+rwx",init dir] ""
-              setEnv "g09root" "/share/apps"
-              setEnv "gr" "/share/apps"
-              setEnv "GAUSS_EXEDIR" "$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09"
-              k1 <- readProcess "/share/apps/g09.profile" [] ""
+--              setEnv "g09root" "/share/apps"
+--              setEnv "gr" "/share/apps"
+--              setEnv "GAUSS_EXEDIR" "$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09"
+--              k1 <- readProcess "/share/apps/g09.profile" [] ""
               totalEnv <- getEnvironment
               setUserID 504
               executeFile "/share/apps/g09/g09" False [(namainput ++ ".g09"),namainput ++ ".log"] (lingkungan totalEnv)
@@ -26,18 +26,18 @@ main = do
             _ -> do
               putStrLn "G09 run error, insufficient arguments from Garami" 
        where lingkungan t = Just ( t ++ [ ( "g09root" , "/share/apps" )
-                                   , ( "gr" , "/share/apps" )
+--                                   , ( "gr" , "/share/apps" )
 --                                 ( "GAUSS_SCRDIR", "/state/partition1/tmp/g09/" ++ k )])
-                                   , ("GAUSS_EXEDIR","$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09")
-                                   , ("GAUSS_LEXEDIR","$gr/g09/linda-exe")
-                                   , ("GAUSS_ARCHDIR","$gr/g09/arch")
+--                                   , ("GAUSS_EXEDIR","$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09")
+--                                   , ("GAUSS_LEXEDIR","$gr/g09/linda-exe")
+--                                   , ("GAUSS_ARCHDIR","$gr/g09/arch")
 --                                 ("GAUSS_BSDDIR","$gr/g09/bsd"),
 --                                 ("GV_DIR","$gr/gv"),
-                                   , ("PATH","$GAUSS_EXEDIR:$PATH")
+--                                   , ("PATH","$GAUSS_EXEDIR:$PATH")
 --                                 ("_DSM_BARRIER","SHM"),
-                                   , ("LD_LIBRARY64_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY64_PATH")
-                                   , ("LD_LIBRARY_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY_PATH")
-                                   , ("G09BASIS","$gr/g09/basis")
+--                                   , ("LD_LIBRARY64_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY64_PATH")
+--                                   , ("LD_LIBRARY_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY_PATH")
+--                                   , ("G09BASIS","$gr/g09/basis")
 --                                 ("PGI_TERM","trace,abort"),
 --                                 ("",""),
 --                                 ("",""),
