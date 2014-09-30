@@ -36,6 +36,7 @@ main = do
                                    , ("PATH","$GAUSS_EXEDIR:$PATH")
 --                                 ("_DSM_BARRIER","SHM"),
                                    , ("LD_LIBRARY64_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY64_PATH")
+                                   , ("LD_LIBRARY_PATH","$GAUSS_EXEDIR:$GV_DIR/lib:$LD_LIBRARY_PATH")
                                    , ("G09BASIS","$gr/g09/basis")
 --                                 ("PGI_TERM","trace,abort"),
 --                                 ("",""),
