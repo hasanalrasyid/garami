@@ -18,7 +18,7 @@ main = do
               setEnv "g09root" "/share/apps"
               setEnv "gr" "/share/apps"
               setEnv "GAUSS_EXEDIR" "$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09"
-              k1 <- readProcess "source" ["$gr/g09.profile"] ""
+              k1 <- readProcess "$gr/g09.profile" [] ""
               totalEnv <- getEnvironment
               setUserID 504
               executeFile "/share/apps/g09/g09" False [(namainput ++ ".g09"),namainput ++ ".log"] (lingkungan totalEnv)
