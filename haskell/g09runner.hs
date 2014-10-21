@@ -1,6 +1,5 @@
 import System.Environment (getArgs)
 import System.Process (system,runProcess)
-import System.Cmd
 import System.Posix.User
 import System.Posix.Process
 import System.Environment
