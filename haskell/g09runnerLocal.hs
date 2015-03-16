@@ -28,7 +28,6 @@ main = do
             [namainput] -> do
               isiinput <- readFile (namainput ++ ".g09")
               writeFile (tempFile ++ ".grm.in") $ susunG09 ishmar namainput tempFile isiinput
-              _ <- system $ "mkdir -p /state/partition1/tmp/g09/" ++ tempFile 
 --              dir <- readProcess "pwd" [] ""
 --              kk <- readProcess "chmod" ["oug+rwx",init dir] ""
 --              setEnv "g09root" "/share/apps"
@@ -37,6 +36,7 @@ main = do
 --              k1 <- readProcess "/share/apps/g09.profile" [] ""
               totalEnv <- getEnvironment
               setUserID 504
+              _ <- system $ "mkdir -p /state/partition1/tmp/g09/" ++ tempFile 
               executeFile "/share/apps/g09/g09" False [(tempFile ++ ".grm.in"),namainput ++ ".log"] (lingkungan totalEnv tempFile)
               return ()
             _ -> do
