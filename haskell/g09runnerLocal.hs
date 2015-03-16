@@ -26,6 +26,7 @@ main = do
           tempFile <- susunRandom 
           case args of
             [namainput] -> do
+              _ <- system "rm -rf *.grm.in" 		
               isiinput <- readFile (namainput ++ ".g09")
               writeFile (tempFile ++ ".grm.in") $ susunG09 ishmar namainput tempFile isiinput
 --              dir <- readProcess "pwd" [] ""
