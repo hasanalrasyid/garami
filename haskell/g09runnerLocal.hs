@@ -37,7 +37,7 @@ main = do
 --              k1 <- readProcess "/share/apps/g09.profile" [] ""
               totalEnv <- getEnvironment
               setUserID 504
-              executeFile "/share/apps/g09/g09" False [(namainput ++ ".g09"),namainput ++ ".log"] (lingkungan totalEnv tempFile)
+              executeFile "/share/apps/g09/g09" False [(tempFile ++ ".grm.in"),namainput ++ ".log"] (lingkungan totalEnv tempFile)
               return ()
             _ -> do
               putStrLn "G09 run error, insufficient arguments from Garami" 
