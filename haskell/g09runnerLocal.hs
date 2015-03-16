@@ -13,8 +13,8 @@ main = do
           args <- getArgs
           case args of
             [namainput] -> do
-              dir <- readProcess "pwd" [] ""
-              kk <- readProcess "chmod" ["oug+rwx",init dir] ""
+--              dir <- readProcess "pwd" [] ""
+--              kk <- readProcess "chmod" ["oug+rwx",init dir] ""
 --              setEnv "g09root" "/share/apps"
 --              setEnv "gr" "/share/apps"
 --              setEnv "GAUSS_EXEDIR" "$gr/g09/bsd:$gr/g09/local:$gr/g09/extras:$gr/g09"
