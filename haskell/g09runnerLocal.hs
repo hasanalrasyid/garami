@@ -14,7 +14,7 @@ susunRandom = do
     values <- evalRandIO (sequence (replicate 10 (getRandomR (97,122))))
     return $ map chr values
 
-ishmar = Antrian "ishmar" "12" "30GB" "719"
+ishmar = Antrian "ishmar" "12" "7GB" "719"
  
 -- ini main function jangan diulik
 -- ?lalu ngerun outputfile masuk antrian (dengan qsub yang sesuai dengan jenis antrian)
