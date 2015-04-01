@@ -1,6 +1,7 @@
-import System.Environment (getArgs)
+import System.Environment (getArgs,getEnv)
 import Text.Regex.Posix -- untuk =~
-import System.Process (system,runProcess)
+import System.Process (system,runProcess,readProcess)
+import System.Exit (exitWith,ExitCode(..))
 import Control.Monad.Random (evalRandIO,getRandomR)
 import Data.Char (chr)
 import Data.List (intercalate)
@@ -59,6 +60,9 @@ susunRandom = do
     return $ map chr values
 
 
+fallOverAndDie :: String -> IO a
+fallOverAndDie err = do putStrLn err
+                        exitWith (ExitFailure 1)
 
 -- ini main function jangan diulik
 -- ?lalu ngerun outputfile masuk antrian (dengan qsub yang sesuai dengan jenis antrian)
@@ -79,6 +83,15 @@ main = do
               putStrLn "Penyusunan Jobscript"
               system "rm -f *.grm.in"
               system "rm -f *.sge"
+              fKerja <- fmap init $ readProcess "pwd" [] []
+              putStrLn $ "folder kerja adalah " ++ fKerja
+              fHome <- getEnv "HOME"
+              if (((=~) fKerja $ fHome ++ "$" ):: Bool) then fallOverAndDie $ 
+                unlines [ "Anda harus bekerja dalam folder dibawah ~ (HOME), misalnya: " ++ fHome ++ "/kerja1"
+                        ,"Cek folder tempat anda kerja saat ini dengan perintah"
+                        ," pwd"
+                        ," ---Selamat Berkarya" ]
+                                                        else return ()
               system "chmod -fR g+rwx `pwd`"
               case (last (splitOn "." input)) of
                 "ff8" -> do
