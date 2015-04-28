@@ -45,6 +45,7 @@ interactWith jenisAntrian inputFile = do
                       "antasena" -> antasena
                       "antareja" -> antareja
                       "srenggini" -> srenggini
+                      "priv1" -> priv1
                       _ -> gatotkaca
           aplikasisge = case (last (splitOn "." inputFile)) of
                        "g09" -> susunG09sge
