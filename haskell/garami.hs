@@ -15,21 +15,28 @@ import GaramiRebound
 import GaramiNAMD 
 import GaramiQE 
 import GaramiSIESTA
-
+import System.Directory (doesFileExist)
 --  membaca inputFile sebagai variabel input 
 --  lalu menuliskan hasil (jenisAntrian input) ke dalam namaFile.in
 --  lalu menyusun jobscript .sge (jobscript jenisAntrian input)
 --
+interactWith :: String -> String -> IO () 
 interactWith jenisAntrian inputFile = do
     tempFile <- susunRandom
-    writeFile (tempFile ++ ".sge") (aplikasisge antrian namaFile tempFile)  -- menyusun File.sge
+    let hasilsge = (aplikasisge antrian namaFile tempFile)
+    writeFile (tempFile ++ ".sge")  hasilsge -- menyusun File.sge
     case inputFile of 
       "custom" -> do
                   putStrLn "Custom Apps, maka tidak ada file yang disusun"
                   return ()
       _ -> do
            input <- readFile inputFile   -- baca inputFile as variabel input
-           writeFile (tempFile ++ ".grm.in") (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
+           let hasilAplikasi' = (aplikasi antrian namaFile tempFile input)  -- menyusun File.in
+           cekChk <- doesFileExist $ namaFile ++ ".chk"
+           let hasilAplikasi = if cekChk 
+                                 then unlines ["%OldChk=" ++ namaFile ++ ".chk",hasilAplikasi']
+                                 else hasilAplikasi'
+           writeFile (tempFile ++ ".grm.in") hasilAplikasi   -- menyusun File.in
     -- ? run jobscript.sge masuk antrian dengan sge
 --    ExitStatus <- runProcess "echo + > kadalijo" [] []
     where namaFile = intercalate "." (init (splitOn "." inputFile ))
