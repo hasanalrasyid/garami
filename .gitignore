@@ -2,3 +2,4 @@ haskell/.cabal-sandbox
 cabal.sandbox.config
 a.out
 build/*
+haskell/dist/*
